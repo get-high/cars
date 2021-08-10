@@ -8,20 +8,22 @@ class SalonsClientService
 {
     private $login;
     private $password;
+    private $url;
 
-    public function __construct($login, $password)
+    public function __construct($login, $password, $url)
     {
         $this->login = $login;
         $this->password = $password;
+        $this->url = $url;
     }
 
     public function getTwo()
     {
-        return Http::withBasicAuth($this->login, $this->password)->get('https://studentsapi.academy.qsoft.ru/api/v1/salons/two_randoms');
+        return Http::withBasicAuth($this->login, $this->password)->get($this->url.'/two_randoms');
     }
 
     public function getAll()
     {
-        return Http::withBasicAuth($this->login, $this->password)->get('https://studentsapi.academy.qsoft.ru/api/v1/salons');
+        return Http::withBasicAuth($this->login, $this->password)->get($this->url);
     }
 }

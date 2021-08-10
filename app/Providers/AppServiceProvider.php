@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(SalonsClientService::class, function () {
-            return new SalonsClientService(config('salon.login'), config('salon.password'));
+            return new SalonsClientService(config('salon.login'), config('salon.password'), config('salon.url'));
         });
     }
 
