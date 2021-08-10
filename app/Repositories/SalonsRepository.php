@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\SalonsRepositoryContract;
-use App\Service\SalonsClientService;
+use App\Services\SalonsClientService;
 
 class SalonsRepository implements SalonsRepositoryContract
 {
@@ -16,11 +16,15 @@ class SalonsRepository implements SalonsRepositoryContract
 
     public function getTwo()
     {
-        return $this->salonsClientService->getTwo();
+        return \Cache::tags(['salons'])->remember('two_salons', 300, function () {
+            return $this->salonsClientService->getTwo()->object();
+        });
     }
 
     public function getAll()
     {
-        return $this->salonsClientService->getAll();
+        return \Cache::tags(['salons'])->remember('all_salons', 3600, function () {
+            return $this->salonsClientService->getAll()->object();
+        });
     }
 }

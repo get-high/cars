@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Contracts\ArticlesRepositoryContract;
 use App\Http\Requests\Image;
-use App\Service\ImagesUploader;
-use App\Service\TagsSynchronizer;
+use App\Services\ImagesUploader;
+use App\Services\TagsSynchronizer;
 use App\Http\Requests\Article;
 use App\Http\Requests\Tag;
-use Illuminate\Support\Facades\Gate;
 
 class ArticleController extends Controller
 {
@@ -21,7 +20,7 @@ class ArticleController extends Controller
 
     public function index()
     {
-        $articles = $this->articlesRepository->all(5);
+        $articles = $this->articlesRepository->get(5);
         return view('pages.news', compact('articles'));
     }
 

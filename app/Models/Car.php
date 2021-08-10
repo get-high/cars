@@ -11,6 +11,23 @@ class Car extends Model
 
     protected $fillable = ['name', 'body', 'price', 'old_price', 'car_body_id'];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function () {
+            \Cache::tags(['cars'])->flush();
+        });
+
+        static::updated(function () {
+            \Cache::tags(['cars'])->flush();
+        });
+
+        static::deleted(function () {
+            \Cache::tags(['cars'])->flush();
+        });
+    }
+
     public function carEngine()
     {
         return $this->belongsTo(CarEngine::class);

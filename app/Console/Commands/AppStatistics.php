@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Service\StatisticsBuilder;
-use Carbon\Carbon;
+use App\Services\StatisticsBuilder;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class AppStatistics extends Command
 {

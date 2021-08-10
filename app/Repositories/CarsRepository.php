@@ -8,24 +8,36 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CarsRepository implements CarsRepositoryContract
 {
-    public function all($count)
+    public function getCatalog($count)
     {
-        return Car::paginate($count);
+        $page = request()->get('page') ? request()->get('page') : 1;
+        return \Cache::tags(['cars'])->remember('catalog_page_'.$page, 3600, function () use ($count) {
+            return Car::paginate($count);
+        });
     }
 
     public function getCar($id)
     {
-        return Car::with('images')->findOrFail($id);
+        return \Cache::tags(['cars'])->remember('car_'.$id, 3600, function () use ($id) {
+            return Car::with('images')->findOrFail($id);
+        });
     }
 
-    public function getCarsFromCategory($categories, $count)
+    public function getCategory($category, $count)
     {
-        return Car::whereIn('category_id', $categories)->paginate($count);
+        $page = request()->get('page') ? request()->get('page') : 1;
+        $categories = $category->descendants()->withDepth()->having('depth', '<=', 1)->pluck('id');
+        $categories[] = $category->getKey();
+        return \Cache::tags(['cars'])->remember('catalog_category_'.$category->id.'_page_'.$page, 3600, function () use ($categories, $count) {
+            return Car::whereIn('category_id', $categories)->paginate($count);
+        });
     }
 
     public function getNew($count)
     {
-        return Car::where('is_new', 1)->take($count)->get();
+        return \Cache::tags(['cars'])->remember('new_cars', 3600, function () use ($count) {
+            return Car::where('is_new', 1)->take($count)->get();
+        });
     }
 
     public function index()
@@ -35,14 +47,14 @@ class CarsRepository implements CarsRepositoryContract
 
     public function delete($id)
     {
-        $car = $this->getCar($id);
+        $car = Car::findOrFail($id);
         $car->images()->sync([]);
         return $car->delete();
     }
 
     public function save(FormRequest $request, $id)
     {
-        $car = $this->getCar($id);
+        $car = Car::findOrFail($id);
         $car->update($request->validated());
         return $car;
     }

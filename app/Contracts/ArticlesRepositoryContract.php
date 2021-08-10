@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 interface ArticlesRepositoryContract
 {
-    public function all($count);
+    public function get($count);
     public function getLast($count);
     public function getArticle($slug);
     public function delete($slug);

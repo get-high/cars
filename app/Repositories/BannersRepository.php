@@ -7,8 +7,10 @@ use App\Models\Banner;
 
 class BannersRepository implements BannersRepositoryContract
 {
-    public function getBanners($count)
+    public function get($count)
     {
-        return Banner::take($count)->inRandomOrder()->get();
+        return \Cache::tags(['banners'])->remember('index_banners', 3600, function () use ($count) {
+            return Banner::take($count)->inRandomOrder()->get();
+        });
     }
 }
