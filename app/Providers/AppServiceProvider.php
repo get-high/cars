@@ -4,9 +4,8 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Repositories\SalonsRepository;
-use App\Service\SalonsClientService;
+use App\Services\SalonsClientService;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
             $view->with('categories', Category::orderBy('sort', 'asc')->get());
         });
 
-        View::share('salons', $salonsRepository->getTwo()->object());
+        view()->composer('components.panels.footer', function($view) use ($salonsRepository) {
+            $view->with('salons', $salonsRepository->getTwo());
+        });
     }
 }

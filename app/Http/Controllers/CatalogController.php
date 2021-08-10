@@ -18,7 +18,7 @@ class CatalogController extends Controller
 
     public function index()
     {
-        $cars = $this->carsRepository->all(16);
+        $cars = $this->carsRepository->getCatalog(16);
         return view('pages.catalog', compact('cars'));
     }
 
@@ -31,9 +31,7 @@ class CatalogController extends Controller
     public function category($slug)
     {
         $category = $this->categoriesRepository->getCategory($slug);
-        $categories = $category->descendants()->withDepth()->having('depth', '<=', 1)->pluck('id');
-        $categories[] = $category->getKey();
-        $cars = $this->carsRepository->getCarsFromCategory($categories, 12);
+        $cars = $this->carsRepository->getCategory($category, 12);
         return view('pages.catalog', compact('cars', 'category'));
     }
 }

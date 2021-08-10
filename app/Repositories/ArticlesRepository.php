@@ -17,38 +17,45 @@ class ArticlesRepository implements ArticlesRepositoryContract
         $this->article = $article;
     }
 
-    public function all($count)
+    public function get($count)
     {
-        return Article::with('tags')
-            ->where('published_at', '<', Carbon::now()->format('Y-m-d H:i:s'))
-            ->orderBy('published_at', 'desc')
-            ->paginate($count);
+        $page = request()->get('page') ? request()->get('page') : 1;
+        return \Cache::tags(['articles'])->remember('articles_page_'.$page, 3600, function () use ($count) {
+            return Article::with('tags')
+                ->where('published_at', '<', Carbon::now()->format('Y-m-d H:i:s'))
+                ->orderBy('published_at', 'desc')
+                ->paginate($count);
+        });
     }
 
     public function getLast($count)
     {
-        return Article::with('tags')
-            ->where('published_at', '<', Carbon::now()->format('Y-m-d H:i:s'))
-            ->orderBy('published_at', 'desc')
-            ->take($count)
-            ->get();
+        return \Cache::tags(['articles'])->remember('index_articles', 3600, function () use ($count) {
+            return Article::with('tags')
+                ->where('published_at', '<', Carbon::now()->format('Y-m-d H:i:s'))
+                ->orderBy('published_at', 'desc')
+                ->take($count)
+                ->get();
+        });
     }
 
     public function getArticle($slug)
     {
-        return Article::where('slug', $slug)->first();
+        return \Cache::tags(['articles'])->remember('article_'.$slug, 3600, function () use ($slug) {
+            return Article::where('slug', $slug)->first();
+        });
     }
 
     public function delete($slug)
     {
-        $article = $this->getArticle($slug);
+        $article = Article::findOrFail($slug);
         $article->tags()->sync([]);
         return $article->delete();
     }
 
     public function save(FormRequest $request, $slug)
     {
-        $article = $this->getArticle($slug);
+        $article = Article::findOrFail($slug);
         $article->update($request->validated());
         ArticleEdited::dispatch($article);
         return $article;

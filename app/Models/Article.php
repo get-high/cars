@@ -21,6 +21,23 @@ class Article extends Model implements HasTags
         'deleted' => ArticleDeleted::class,
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function () {
+            \Cache::tags(['articles'])->flush();
+        });
+
+        static::updated(function () {
+            \Cache::tags(['articles'])->flush();
+        });
+
+        static::deleted(function () {
+            \Cache::tags(['articles'])->flush();
+        });
+    }
+
     public function getRouteKeyName()
     {
         return 'slug';

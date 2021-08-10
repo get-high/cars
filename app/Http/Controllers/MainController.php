@@ -26,13 +26,13 @@ class MainController extends Controller
     {
         $newCars = $this->carsRepository->getNew(4);
         $articles = $this->articlesRepository->getLast(3);
-        $banners = $this->bannersRepository->getBanners(3);
+        $banners = $this->bannersRepository->get(3);
         return view('pages.homepage', compact('articles', 'newCars', 'banners'));
     }
 
     public function salons()
     {
-        $allSalons = $this->salonsRepository->getAll()->object();
+        $allSalons = $this->salonsRepository->getAll();
         return view('pages.salon', compact('allSalons'));
     }
 
